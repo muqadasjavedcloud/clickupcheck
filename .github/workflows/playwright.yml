@@ -1,38 +1,36 @@
-name: Cypress tests on push
+name: Playwright Tests
 
+# 🚀 Run this workflow every time code is pushed or a PR is opened
 on:
   push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  cypress-run:
-    name: Run Cypress tests
+  run-playwright-tests:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
 
     steps:
+      # Step 1 — Checkout your code
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      # Step 2 — Set up Node.js (v22 recommended)
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: 22
 
+      # Step 3 — Install dependencies
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Verify Cypress
-        run: npx cypress verify
+      # Step 4 — Install Playwright browsers
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
 
-      - name: Run Cypress tests
+      # Step 5 — Run Playwright tests
+      - name: Run Playwright Tests
         run: npx cypress run --spec "cypress/e2e/**/*.cy.js"
-
-      - name: Upload Cypress artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: cypress-artifacts
-          path: |
-            cypress/videos
-            cypress/screenshots
-            cypress/results
+        

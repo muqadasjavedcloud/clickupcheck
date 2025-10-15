@@ -18,10 +18,13 @@ jobs:
           node-version: '18'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
+      # ✅ Official Cypress GitHub Action — handles install + binary automatically
       - name: Run Cypress tests
-        run: npx cypress run --spec "cypress/e2e/**/*.cy.js"
+        uses: cypress-io/github-action@v6
+        with:
+          spec: "cypress/e2e/**/*.cy.js"
 
       - name: Upload Cypress report
         if: always()
@@ -34,7 +37,7 @@ jobs:
         if: success()
         run: |
           curl -X POST "https://api.clickup.com/api/v2/task/86eux6n2e/comment" \
-            -H "Authorization: ${{ secrets.CLICKUP_TOKEN}}" \
+            -H "Authorization: ${{ secrets.CLICKUP_TOKEN }}" \
             -H "Content-Type: application/json" \
             -d '{
               "comment_text": "✅ Cypress tests passed successfully on latest GitHub push! 🚀\n\nRun details: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
